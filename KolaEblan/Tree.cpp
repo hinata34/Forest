@@ -66,6 +66,24 @@ void Tree::display(sf::RenderWindow& window) {
 	
 }
 
+void Tree::clear()
+{
+	for (auto& in : this->phases) {
+		clearTrue(in);
+		in = nullptr;
+	}
+	this->phases.resize(1000000, nullptr);
+}
+
+void Tree::clearTrue(super::Node* elem) {
+	if (elem == nullptr) {
+		return;
+	}
+	clearTrue(elem->right);
+	clearTrue(elem->left);
+	delete(elem);
+}
+
 int64_t Tree::countHeight()
 {
 	if (this->phases[this->index] == nullptr) {

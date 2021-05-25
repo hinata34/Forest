@@ -3,6 +3,8 @@
 #include "Input.h"
 #include "BinaryTree.h"
 #include "AVL.h"
+#include "SplayTree.h"
+#include "TreapTree.h"
 class Window
 {
 public:

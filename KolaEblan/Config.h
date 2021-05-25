@@ -11,6 +11,7 @@
 #include <string>
 #include <stdlib.h>
 #include <cmath>
+#include <time.h>
 #include <functional>
 #include "NameSpaceSuper.h"
 

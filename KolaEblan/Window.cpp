@@ -8,14 +8,16 @@ void RemoveFromTrees(std::vector<Tree*> trees, int64_t key, int64_t& index);
 void SimpleTree(std::vector<Tree*> trees, int64_t key, int64_t& index);
 void AVLTree(std::vector<Tree*> trees, int64_t key, int64_t& index);
 void RedBlackTree(std::vector<Tree*> trees, int64_t key, int64_t& index);
-void SplayTree(std::vector<Tree*> trees, int64_t key, int64_t& index);
-void TreapTree(std::vector<Tree*> trees, int64_t key, int64_t& index);
+void Splay(std::vector<Tree*> trees, int64_t key, int64_t& index);
+void Treap(std::vector<Tree*> trees, int64_t key, int64_t& index);
+void ResetTree(std::vector<Tree*> trees, int64_t key, int64_t& index);
+void SplayFunc(std::vector<Tree*> trees, int64_t key, int64_t& index);
 void Window::render() {
     sf::RenderWindow window(sf::VideoMode(WIDTH, HEIGHT), "SFML works!", sf::Style::Default);
 
     sf::Font font;
     font.loadFromFile("Ubuntu-B.ttf");
-
+    srand(time(nullptr));
 
     std::vector<Button*> buttons;
 
@@ -23,10 +25,13 @@ void Window::render() {
     buttons.push_back(new Button({ 150, 80 }, { 50, 100 }, { "Remove", font, 20 }, { 245,171,201 }, RemoveFromTrees));
     buttons.push_back(new Button({ 40, 200 }, { 50, 210 }, { "Simple", font, 30 }, { 245,171,201 }, SimpleTree));
     buttons.push_back(new Button({ 40, 260 }, { 50, 210 }, { "AVL", font, 30 }, { 245,171,201 }, AVLTree));
-    buttons.push_back(new Button({ 40, 320 }, { 50, 210 }, { "Red Black", font, 30 }, { 245,171,201 }, nullptr));
-    buttons.push_back(new Button({ 40, 380 }, { 50, 210 }, { "Splay", font, 30 }, { 245,171,201 }, nullptr));
-    buttons.push_back(new Button({ 40, 440 }, { 50, 210 }, { "Treap", font, 30 }, { 245,171,201 }, nullptr));
-    buttons.push_back(new Button({ 40, 500 }, { 50, 210 }, { "Reset", font, 30 }, { 245,171,201 }, nullptr));
+    buttons.push_back(new Button({ 40, 320 }, { 50, 210 }, { "Splay", font, 30 }, { 245,171,201 }, Splay));
+    buttons.push_back(new Button({ 40, 380 }, { 50, 210 }, { "Treap", font, 30 }, { 245,171,201 }, Treap));
+    buttons.push_back(new Button({ 40, 440 }, { 50, 210 }, { "Red Black", font, 30 }, { 245,171,201 }, nullptr));
+    buttons.push_back(new Button({ 40, 500 }, { 50, 210 }, { "Reset", font, 30 }, { 245,171,201 }, ResetTree));
+
+    std::vector<std::pair<Button*, std::pair<int, int>>> special_buttons;
+    std::vector<std::pair<Input*, int>> special_inputs;
 
     std::vector<Input*> inputs;
     inputs.push_back(new Input({ 40 , 20 }, { 50, 210 }, { 245,171,201 }, { "", font, 20 }));
@@ -34,7 +39,13 @@ void Window::render() {
     std::vector<Tree*> trees;
     trees.push_back(new BinaryTree({ 233, 59, 129 }));
     trees.push_back(new AVL({ 233, 59, 129 }));
+    trees.push_back(new SplayTree({ 233, 59, 129 }));
+    trees.push_back(new TreapTree({ 233, 59, 129 }));
+
     int64_t index = -1;
+
+    special_inputs.push_back({ new Input({ 40 , 600 }, { 50, 210 }, { 245,171,201 }, { "", font, 20 }) , 2});
+    special_buttons.push_back({ new Button({ 40, 660 }, { 50, 210 }, { "Splay", font, 30 }, { 245,171,201 }, SplayFunc), {0, 2} });
 
     sf::CircleShape ha(100.f);
     sf::RectangleShape background;
@@ -93,10 +104,20 @@ void Window::render() {
                 for (auto in : inputs) {
                     in->setIsPressed(in->checkClick(window));
                 }
+                for (std::pair<Input*, int> in : special_inputs) {
+                    in.first->setIsPressed(in.first->checkClick(window));
+                }
                 for (auto in : buttons) {
                     if (in->checkClick(window)) {
                         if (in->getOnClick()) {
                             in->getOnClick()(trees, (inputs[0]->getText().text == "" ? 0 : std::stoll(inputs[0]->getText().text)), index);
+                        }
+                    }
+                }
+                for (std::pair<Button*, std::pair<int, int>> in : special_buttons) {
+                    if (in.first->checkClick(window)) {
+                        if (in.first->getOnClick()) {
+                            in.first->getOnClick()(trees, (special_inputs[in.second.first].first->getText().text == "" ? 0 : std::stoll(special_inputs[in.second.first].first->getText().text)), index);
                         }
                     }
                 }
@@ -110,6 +131,13 @@ void Window::render() {
                         }
                     }
                 }
+                for (std::pair<Input*, int> in : special_inputs) {
+                    if (in.first->getIsPressed()) {
+                        if ((event.text.unicode >= 0x30 && event.text.unicode <= 0x39 || event.text.unicode == '-') && in.first->getText().text.size() < 8) {
+                            in.first->setString(in.first->getString() + static_cast<char>(event.text.unicode));
+                        }
+                    }
+                }
             }
             if (sf::Keyboard::isKeyPressed(sf::Keyboard::Backspace)) {
                 for (auto in : inputs) {
@@ -120,6 +148,15 @@ void Window::render() {
                         }
                     }
                 }
+                for (std::pair<Input*, int> in : special_inputs) {
+                    if (in.first->getIsPressed()) {
+                        ++back;
+                        if (in.first->getText().text.size() != 0 && back % 2 == 1) {
+                            in.first->setText(in.first->getText().text.erase(in.first->getText().text.size() - 1, 1), in.first->getText().font, in.first->getText().char_size);
+                        }
+                    }
+                }
+                
             }
 
         }
@@ -136,6 +173,18 @@ void Window::render() {
             buttons[in]->display(window, 50, 5);
             buttons[in]->setColor({ 245,171,201 });
         }
+
+        for (auto in : special_buttons) {
+            if (in.second.second == index) {
+                in.first->display(window, 50, 5);
+            }
+        }
+        for (auto in : special_inputs) {
+            if (in.second == index) {
+                in.first->display(window, 0, 0);
+            }
+        }
+
         for (auto in : inputs) {
             in->display(window, 0 , 0);
         }
@@ -155,6 +204,7 @@ void InsertInTrees(std::vector<Tree*> trees, int64_t key, int64_t& index) {
         in->insert(key);
     }
 }
+
 void RemoveFromTrees(std::vector<Tree*> trees, int64_t key, int64_t& index) {
     if (index == -1) {
         return;
@@ -163,26 +213,43 @@ void RemoveFromTrees(std::vector<Tree*> trees, int64_t key, int64_t& index) {
         in->remove(key);
     }
 }
+
+
 void SimpleTree(std::vector<Tree*> trees, int64_t key, int64_t& index) {
     index = 0;
-   
-}
-void AVLTree(std::vector<Tree*> trees, int64_t key, int64_t& index) {
-    index = 1;
-   
 }
 
-void RedBlackTree(std::vector<Tree*> trees, int64_t key, int64_t& index)
+void AVLTree(std::vector<Tree*> trees, int64_t key, int64_t& index) {
+    index = 1;
+}
+
+void Splay(std::vector<Tree*> trees, int64_t key, int64_t& index)
 {
     index = 2;
 }
 
-void SplayTree(std::vector<Tree*> trees, int64_t key, int64_t& index)
+void Treap(std::vector<Tree*> trees, int64_t key, int64_t& index)
 {
     index = 3;
 }
 
-void TreapTree(std::vector<Tree*> trees, int64_t key, int64_t& index)
+void RedBlackTree(std::vector<Tree*> trees, int64_t key, int64_t& index)
 {
     index = 4;
 }
+
+void ResetTree(std::vector<Tree*> trees, int64_t key, int64_t& index)
+{
+    for (auto in : trees) {
+        in->clear();
+    }
+}
+
+void SplayFunc(std::vector<Tree*> trees, int64_t key, int64_t& index)
+{
+    if (trees[index] == nullptr) {
+        return;
+    }
+    dynamic_cast<SplayTree*>(trees[index])->splay(key);
+}
+
