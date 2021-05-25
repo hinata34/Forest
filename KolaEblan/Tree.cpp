@@ -52,10 +52,17 @@ void Tree::display(sf::RenderWindow& window) {
 		circles.pop();
 		circle.setPosition(element.second.first.first, element.second.first.second);
 		circle.setFillColor(sf::Color(element.first->color.red, element.first->color.green, element.first->color.blue));
-		text.setPosition(circle.getPosition().x + 30, circle.getPosition().y + 30);
 		text.setString(std::to_string(element.first->key));
+		text.setCharacterSize(30 - (std::to_string(element.first->key).size() / 2.5) * 5);
+		text.setPosition(circle.getPosition().x + 40 - (std::to_string(element.first->key).size() / 2.5) * 7, circle.getPosition().y + 30 + (std::to_string(element.first->key).size() / 2.5) * 3);
 		window.draw(circle);
 		window.draw(text);
+		if (element.first->priority != -1) {
+			text.setPosition(circle.getPosition().x - 25, circle.getPosition().y - 25);
+			text.setCharacterSize(25);
+			text.setString(std::to_string(element.first->priority));
+			window.draw(text);
+		}
 		if (element.first->left != nullptr) {
 			circles.push({ element.first->left, {{element.second.first.first - coef * pow(2, element.second.second), element.second.first.second + 150}, element.second.second - 1} });
 		}

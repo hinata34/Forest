@@ -9,7 +9,7 @@ AVL::AVL(super::RGB color)
 void AVL::insert(int64_t key)
 {
 	if (countHeight() == 0) {
-		phases[index] = new super::Node(nullptr, nullptr, key, 1, 0, color);
+		phases[index] = new super::Node(nullptr, nullptr, key, 1, -1, color);
 	}
 	else {
 		phases[index] = insertTrue(phases[index], key);
@@ -44,7 +44,7 @@ int max(int a, int b)
 super::Node* AVL::insertTrue(super::Node* node, int64_t key)
 {
     if (node == nullptr)
-        return(new super::Node(nullptr, nullptr, key, 1, 0, color));
+        return(new super::Node(nullptr, nullptr, key, 1, -1, color));
 
     if (key < node->key)
         node->left = insertTrue(node->left, key);

@@ -5,6 +5,7 @@
 #include "AVL.h"
 #include "SplayTree.h"
 #include "TreapTree.h"
+#include "RBTree.h"
 class Window
 {
 public:

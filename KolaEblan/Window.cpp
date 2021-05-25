@@ -12,6 +12,7 @@ void Splay(std::vector<Tree*> trees, int64_t key, int64_t& index);
 void Treap(std::vector<Tree*> trees, int64_t key, int64_t& index);
 void ResetTree(std::vector<Tree*> trees, int64_t key, int64_t& index);
 void SplayFunc(std::vector<Tree*> trees, int64_t key, int64_t& index);
+void CreatesElements(std::vector<Tree*> trees, int64_t key, int64_t& index);
 void Window::render() {
     sf::RenderWindow window(sf::VideoMode(WIDTH, HEIGHT), "SFML works!", sf::Style::Default);
 
@@ -29,6 +30,7 @@ void Window::render() {
     buttons.push_back(new Button({ 40, 380 }, { 50, 210 }, { "Treap", font, 30 }, { 245,171,201 }, Treap));
     buttons.push_back(new Button({ 40, 440 }, { 50, 210 }, { "Red Black", font, 30 }, { 245,171,201 }, nullptr));
     buttons.push_back(new Button({ 40, 500 }, { 50, 210 }, { "Reset", font, 30 }, { 245,171,201 }, ResetTree));
+    buttons.push_back(new Button({ 40, 560 }, { 50, 210 }, { "Create many elements", font, 18 }, { 245,171,201 }, CreatesElements));
 
     std::vector<std::pair<Button*, std::pair<int, int>>> special_buttons;
     std::vector<std::pair<Input*, int>> special_inputs;
@@ -44,8 +46,9 @@ void Window::render() {
 
     int64_t index = -1;
 
-    special_inputs.push_back({ new Input({ 40 , 600 }, { 50, 210 }, { 245,171,201 }, { "", font, 20 }) , 2});
-    special_buttons.push_back({ new Button({ 40, 660 }, { 50, 210 }, { "Splay", font, 30 }, { 245,171,201 }, SplayFunc), {0, 2} });
+    special_inputs.push_back({ new Input({ 40 , 640 }, { 50, 210 }, { 245,171,201 }, { "", font, 20 }) , 2});
+    special_buttons.push_back({ new Button({ 40, 700 }, { 50, 210 }, { "Splay", font, 30 }, { 245,171,201 }, SplayFunc), {0, 2} });
+
 
     sf::CircleShape ha(100.f);
     sf::RectangleShape background;
@@ -173,6 +176,8 @@ void Window::render() {
             buttons[in]->display(window, 50, 5);
             buttons[in]->setColor({ 245,171,201 });
         }
+        buttons[8]->display(window, 10, 5);
+
 
         for (auto in : special_buttons) {
             if (in.second.second == index) {
@@ -251,5 +256,15 @@ void SplayFunc(std::vector<Tree*> trees, int64_t key, int64_t& index)
         return;
     }
     dynamic_cast<SplayTree*>(trees[index])->splay(key);
+}
+
+void CreatesElements(std::vector<Tree*> trees, int64_t key, int64_t& index)
+{
+    for (int i = 0; i < 10; ++i) {
+        int64_t random = rand();
+        for (auto in : trees) {
+            in->insert(random);
+        }
+    }
 }
 

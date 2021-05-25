@@ -156,6 +156,7 @@
     <ClCompile Include="Button.cpp" />
     <ClCompile Include="Input.cpp" />
     <ClCompile Include="KolaEblan.cpp" />
+    <ClCompile Include="RBTree.cpp" />
     <ClCompile Include="Rectangle.cpp" />
     <ClCompile Include="SplayTree.cpp" />
     <ClCompile Include="TreapTree.cpp" />
@@ -169,6 +170,7 @@
     <ClInclude Include="Config.h" />
     <ClInclude Include="Input.h" />
     <ClInclude Include="NameSpaceSuper.h" />
+    <ClInclude Include="RBTree.h" />
     <ClInclude Include="Rectangle.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="SplayTree.h" />

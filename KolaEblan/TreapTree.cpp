@@ -19,7 +19,7 @@ void TreapTree::insert(int64_t key)
     if (checkTreap(this->phases[this->index], key)) {
         return;
     }
-    super::Node* point_tmp = new super::Node(nullptr, nullptr, key, 0, rand(), color);
+    super::Node* point_tmp = new super::Node(nullptr, nullptr, key, 0, rand() % 100000, color);
     super::Node* left_tree, * right_tree;
 
     splitTree(this->phases[this->index], key, left_tree, right_tree);
